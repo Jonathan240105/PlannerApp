@@ -1,4 +1,8 @@
 package com.example.plannerapp.Views.Screens
 
-class PantallaPrincipal {
+import androidx.compose.runtime.Composable
+
+@Composable
+fun PantallaPrincipal(){
+
 }

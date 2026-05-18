@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.plannerapp.Views.Screens.PantallaInicioSesion
+import com.example.plannerapp.Views.Screens.PantallaPrincipal
 import com.example.plannerapp.Views.ViewModels.InicioSesionViewModel
 import kotlinx.coroutines.flow.combine
 
@@ -16,8 +17,12 @@ fun Controlador() {
     Scaffold() { padding ->
         val inicioViewModel: InicioSesionViewModel = hiltViewModel()
         NavHost(navController = controller, startDestination = "InicioSesion") {
+
             composable("InicioSesion") {
-                PantallaInicioSesion(padding, inicioViewModel)
+                PantallaInicioSesion(padding, inicioViewModel, { controller.navigate("Principal") })
+            }
+            composable("Principal") {
+                PantallaPrincipal()
             }
         }
     }

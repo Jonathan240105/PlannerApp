@@ -2,6 +2,7 @@
 # Plugins y Core
 agp = "8.7.3"
 kotlin = "2.0.21"
+kotlinxCoroutinesTest = "1.7.3"
 ksp = "2.0.21-1.0.28"
 
 # Inyección de Dependencias
@@ -9,6 +10,8 @@ hilt = "2.52"
 hiltNavigationCompose = "1.2.0"
 
 # Red y Datos
+mockitoCore = "5.5.0"
+mockitoKotlin = "5.1.0"
 retrofit = "2.11.0"
 okhttp = "4.12.0"
 room = "2.6.1"
@@ -44,6 +47,9 @@ hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", v
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 
 # Retrofit
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
 okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
