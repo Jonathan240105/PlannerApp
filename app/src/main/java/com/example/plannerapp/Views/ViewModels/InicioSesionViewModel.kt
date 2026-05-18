@@ -19,16 +19,17 @@ class InicioSesionViewModel @Inject constructor(
     private val _model = MutableStateFlow(ModelInicioSesion())
     val model = _model.asStateFlow()
 
-    suspend fun iniciarSesion(email: String, contra: String) {
-        _model.value = _model.value.copy(cargando = true)
+    fun iniciarSesion(email: String, contra: String) {
+        viewModelScope.launch {
+            _model.value = _model.value.copy(cargando = true)
 
-        repository.iniciarSesion(email, contra).collect { resultado ->
-            if (resultado.exito) {
-                _model.update { it.copy(exito = true, cargando = false) }
-            } else {
-                _model.update { it.copy(exito = false, cargando = false) }
+            repository.iniciarSesion(email, contra).collect { resultado ->
+                if (resultado.exito) {
+                    _model.update { it.copy(exito = true, cargando = false) }
+                } else {
+                    _model.update { it.copy(exito = false, cargando = false) }
+                }
             }
-
         }
 
     }

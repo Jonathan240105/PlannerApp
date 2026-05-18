@@ -1,6 +1,7 @@
 package com.example.plannerapp.Data.Repository
 
 import com.example.plannerapp.Data.RemoteData.DataInterface
+import com.example.plannerapp.Data.RemoteData.Responses.InicioSesionSolicitud
 import com.example.plannerapp.Domain.EstadoInicioSesion
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -15,7 +16,7 @@ class RepositoryImp @Inject constructor(
         contra: String
     ): Flow<EstadoInicioSesion> = flow {
 
-        val respuesta = dataInterface.iniciarSesion(email, contra)
+        val respuesta = dataInterface.iniciarSesion(InicioSesionSolicitud(email, contra))
         if (respuesta.isSuccessful) {
             emit(EstadoInicioSesion(exito = true, respuesta.body()?.token))
         } else {
