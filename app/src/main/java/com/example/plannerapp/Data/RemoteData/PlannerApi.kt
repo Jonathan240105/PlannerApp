@@ -1,6 +1,6 @@
 package com.example.plannerapp.Data.RemoteData
 
-import com.example.plannerapp.Data.LocalData.InterceptorAutenticacion
+import com.example.plannerapp.Data.LocalData.SeguridadToken.InterceptorAutenticacion
 import com.example.plannerapp.Data.RemoteData.Variables.APIUrls.urlPlanner
 import dagger.Module
 import dagger.Provides
