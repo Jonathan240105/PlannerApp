@@ -1,4 +1,4 @@
-package com.example.plannerapp.Data.LocalData
+package com.example.plannerapp.Data.LocalData.SeguridadToken
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext

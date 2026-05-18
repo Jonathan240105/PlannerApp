@@ -1,4 +1,4 @@
-package com.example.plannerapp.Data.LocalData
+package com.example.plannerapp.Data.LocalData.SeguridadToken
 
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
