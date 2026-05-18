@@ -13,3 +13,8 @@ data class UsuarioRespuesta(
     val nombre: String,
     val foto: String
 )
+
+data class InicioSesionSolicitud(
+    val email: String,
+    val contra: String
+)

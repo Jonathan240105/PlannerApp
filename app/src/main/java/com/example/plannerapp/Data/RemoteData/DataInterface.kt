@@ -1,16 +1,17 @@
 package com.example.plannerapp.Data.RemoteData
 
 import com.example.plannerapp.Data.RemoteData.Responses.InicioSesionRespuesta
+import com.example.plannerapp.Data.RemoteData.Responses.InicioSesionSolicitud
 import com.example.plannerapp.Data.RemoteData.Variables.Endpoints
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 
 
 interface DataInterface {
-    @GET(Endpoints.iniciarSesion)
+    @POST(Endpoints.iniciarSesion)
     suspend fun iniciarSesion(
-        @Body email: String,
-        @Body contra: String
+        @Body body : InicioSesionSolicitud
     ): Response<InicioSesionRespuesta>
 }
