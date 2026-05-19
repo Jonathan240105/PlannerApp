@@ -5,8 +5,10 @@ import com.example.plannerapp.Data.LocalData.Tareas.TareaLocalDao
 import com.example.plannerapp.Data.LocalData.Tareas.toEntity
 import com.example.plannerapp.Data.LocalData.Tareas.toTarea
 import com.example.plannerapp.Data.RemoteData.DataInterface
+import com.example.plannerapp.Data.RemoteData.Responses.CrearTareaSolicitud
 import com.example.plannerapp.Data.RemoteData.Responses.InicioSesionSolicitud
 import com.example.plannerapp.Data.RemoteData.Responses.ListaConTareasRespuesta
+import com.example.plannerapp.Data.RemoteData.Responses.ListaMiembrosRespuesta
 import com.example.plannerapp.Domain.EstadoInicioSesion
 import com.example.plannerapp.Domain.ListaConTareas
 import com.example.plannerapp.Domain.Tarea
@@ -72,6 +74,54 @@ class RepositoryImp @Inject constructor(
         } catch (e: Exception) {
             println(e.message)
             return false
+        }
+    }
+
+    override suspend fun crearTarea(
+        body: CrearTareaSolicitud,
+        idAsignado: Int,
+        idLista: Int
+    ): Boolean {
+        try {
+            val respuesta = dataInterface.crearTarea(body, idAsignado, idLista)
+
+            return respuesta.isSuccessful
+
+        } catch (e: Exception) {
+            println(e.message)
+            return false
+        }
+    }
+
+    override suspend fun obtenerListasEquipo(): List<ListaConTareas> {
+        return try {
+            val respuesta = dataInterface.obtenerListasEquipoConTareas()
+            if (respuesta.isSuccessful && respuesta.body() != null) {
+                respuesta.body()!!.map { lista ->
+                    ListaConTareas(
+                        idLista = lista.idLista,
+                        nombreLista = lista.nombreLista,
+                        posicion = lista.posicion,
+                        listaTareas = lista.tareas.map { Tarea(it.idTarea, it.titulo) }
+                    )
+                }
+            } else {
+                return emptyList()
+            }
+        } catch (e: Exception) {
+            return emptyList()
+        }
+    }
+
+    override suspend fun obtenerMiembrosEquipo(): List<ListaMiembrosRespuesta> {
+        return try {
+            val respuesta = dataInterface.obtenerMiembrosDropdown()
+            if (respuesta.isSuccessful) respuesta.body() ?: emptyList() else emptyList()
+        } catch (e: Exception) {
+            println(
+                "Error al obtener miembros del equipo: ${e.message}"
+            )
+            return emptyList()
         }
     }
 }

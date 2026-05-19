@@ -2,9 +2,11 @@ package com.example.plannerapp.Data.LocalData.SeguridadToken
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.auth0.android.jwt.JWT // 👈 Importamos la librería de Auth0
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -18,10 +20,20 @@ class ManejadorDeSesiones @Inject constructor(
 ) {
 
     private val tokenJWT = stringPreferencesKey("token")
+    private val rolAdmin = booleanPreferencesKey("es_admin")
 
     suspend fun guardarToken(token: String) {
         context.dataStore.edit { preferences ->
             preferences[tokenJWT] = token
+
+            try {
+                val jwt = JWT(token)
+                val rol = jwt.getClaim("rol").asString()
+
+                preferences[rolAdmin] = (rol == "admin")
+            } catch (e: Exception) {
+                preferences[rolAdmin] = false
+            }
         }
     }
 
@@ -29,4 +41,7 @@ class ManejadorDeSesiones @Inject constructor(
         preferences[tokenJWT]
     }
 
+    val esAdminFlow: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[rolAdmin] ?: false
+    }
 }
