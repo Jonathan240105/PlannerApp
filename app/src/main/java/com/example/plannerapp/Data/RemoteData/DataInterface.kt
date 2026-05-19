@@ -8,6 +8,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 
 interface DataInterface {
@@ -18,4 +19,9 @@ interface DataInterface {
 
     @GET(Endpoints.obtenerListasConTareas)
     suspend fun obtenerListasConTareas(): Response<List<ListaConTareasRespuesta>>
+
+    @POST(Endpoints.crearLista)
+    suspend fun crearLista(
+        @Query("nombre") nombreLista: String
+    ): Response<okhttp3.ResponseBody>
 }
