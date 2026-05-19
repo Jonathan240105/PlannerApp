@@ -19,11 +19,17 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -40,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.plannerapp.Data.RemoteData.Responses.CrearTareaSolicitud
 import com.example.plannerapp.Domain.ListaConTareas
 import com.example.plannerapp.Domain.Tarea
 import com.example.plannerapp.Views.ViewModels.PrincipalViewModel
@@ -53,33 +60,85 @@ fun PantallaPrincipal(
     mostrarDialog: Boolean,
     onCambiarMostrarDialog: (Boolean) -> Unit
 ) {
+    val model by myViewModel.model.collectAsState()
+
+    var idListaSeleccionada by remember { mutableStateOf<Int?>(null) }
+    val listasAMostrar = if (model.vistasEquipo) model.listasEquipo else model.listas
 
     LaunchedEffect(Unit) {
         myViewModel.getListasConTareas()
+        myViewModel.cargarDatosEquipo()
     }
-    val model by myViewModel.model.collectAsState()
 
-    LazyColumn(
-        Modifier
+    Column(
+        modifier = Modifier
             .fillMaxSize()
-            .padding(paddingValues),
-        contentPadding = PaddingValues(20.dp),
-        verticalArrangement = Arrangement.spacedBy(28.dp)
+            .padding(paddingValues)
     ) {
-        if (model.listas.isEmpty()) {
-            item {
-                Text(
-                    "No hay listas creadas en este tablero",
-                    color = Color.Gray,
-                    modifier = Modifier.padding(top = 40.dp)
-                )
-            }
-        } else {
-            items(model.listas) { lista ->
-                EstructuraLista(lista)
+        TabRow(
+            selectedTabIndex = if (model.vistasEquipo) 1 else 0,
+            containerColor = Color.White,
+            contentColor = azulPrimario
+        ) {
+            Tab(
+                selected = !model.vistasEquipo,
+                onClick = { myViewModel.cambiarVista(false) },
+                text = { Text("Mis Tareas", fontWeight = FontWeight.Bold) }
+            )
+            Tab(
+                selected = model.vistasEquipo,
+                onClick = { myViewModel.cambiarVista(true) },
+                text = { Text("Mi Equipo", fontWeight = FontWeight.Bold) }
+            )
+        }
+
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(20.dp),
+            verticalArrangement = Arrangement.spacedBy(28.dp)
+        ) {
+            if (listasAMostrar.isEmpty()) {
+                item {
+                    Text(
+                        if (model.vistasEquipo) "No hay listas de equipo disponibles" else "No hay listas creadas en este tablero",
+                        color = Color.Gray,
+                        modifier = Modifier.padding(top = 40.dp)
+                    )
+                }
+            } else {
+                items(listasAMostrar) { lista ->
+                    EstructuraLista(
+                        lista = lista,
+                        onAñadirTarea = { idListaSeleccionada = lista.idLista }
+                    )
+                }
             }
         }
     }
+
+    if (idListaSeleccionada != null) {
+        DialogoNuevaTarea(
+            esAdmin = model.esAdmin,
+            miembros = model.miembrosEquipo.map {
+                Pair(
+                    it.idUsuario,
+                    it.nombreUsuario
+                )
+            },
+            onDismiss = { idListaSeleccionada = null },
+            onConfirm = { titulo, descripcion, fecha, idAsignado ->
+                val body = CrearTareaSolicitud(
+                    titulo = titulo,
+                    descripcion = descripcion,
+                    fecha_limite = fecha
+                )
+                myViewModel.crearTarea(body, idAsignado, idListaSeleccionada!!)
+                idListaSeleccionada = null
+            }
+        )
+    }
+
     if (mostrarDialog) {
         DialogoPersonalizadoNuevaLista({
             onCambiarMostrarDialog(false)
@@ -91,7 +150,7 @@ fun PantallaPrincipal(
 }
 
 @Composable
-fun EstructuraLista(lista: ListaConTareas) {
+fun EstructuraLista(lista: ListaConTareas, onAñadirTarea: () -> Unit) {
     Card(
         Modifier.padding(1.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -115,7 +174,7 @@ fun EstructuraLista(lista: ListaConTareas) {
                     IconButton(onClick = {}) {
                         Icon(Icons.Rounded.Edit, "Editar", tint = Color.Gray)
                     }
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = onAñadirTarea) {
                         Icon(Icons.Rounded.Add, "Añadir", tint = azulPrimario)
                     }
                 }
@@ -147,6 +206,149 @@ fun EstructuraTarea(tarea: Tarea) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DialogoNuevaTarea(
+    esAdmin: Boolean,
+    miembros: List<Pair<Int, String>>,
+    onDismiss: () -> Unit,
+    onConfirm: (String, String, String, Int) -> Unit
+) {
+    var titulo by remember { mutableStateOf("") }
+    var descripcion by remember { mutableStateOf("") }
+    var fecha by remember { mutableStateOf("") }
+
+    var dropdownExpandido by remember { mutableStateOf(false) }
+    var miembroSeleccionado by remember { mutableStateOf<Pair<Int, String>?>(null) }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            Modifier
+                .fillMaxWidth()
+                .padding(10.dp),
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
+        ) {
+            Column(
+                Modifier
+                    .padding(22.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    "Nueva Tarea",
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 22.sp,
+                    color = Color.Black
+                )
+                Spacer(Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = titulo,
+                    onValueChange = { titulo = it },
+                    label = { Text("Título") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = azulPrimario,
+                        focusedLabelColor = azulPrimario
+                    )
+                )
+                Spacer(Modifier.height(12.dp))
+
+                OutlinedTextField(
+                    value = descripcion,
+                    onValueChange = { descripcion = it },
+                    label = { Text("Descripción") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = azulPrimario,
+                        focusedLabelColor = azulPrimario
+                    )
+                )
+                Spacer(Modifier.height(12.dp))
+
+                OutlinedTextField(
+                    value = fecha,
+                    onValueChange = { fecha = it },
+                    label = { Text("Fecha Límite (fecha y hora)") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = azulPrimario,
+                        focusedLabelColor = azulPrimario
+                    )
+                )
+
+                if (esAdmin) {
+                    Spacer(Modifier.height(16.dp))
+                    Text(
+                        "Asignar a:",
+                        color = Color.Gray,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Spacer(Modifier.height(6.dp))
+
+                    ExposedDropdownMenuBox(
+                        expanded = dropdownExpandido,
+                        onExpandedChange = { dropdownExpandido = it }
+                    ) {
+                        OutlinedTextField(
+                            value = miembroSeleccionado?.second ?: "Selecciona un usuario",
+                            onValueChange = {},
+                            readOnly = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropdownExpandido) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = azulPrimario)
+                        )
+                        ExposedDropdownMenu(
+                            expanded = dropdownExpandido,
+                            onDismissRequest = { dropdownExpandido = false }
+                        ) {
+                            miembros.forEach { miembro ->
+                                DropdownMenuItem(
+                                    text = { Text(miembro.second) },
+                                    onClick = {
+                                        miembroSeleccionado = miembro
+                                        dropdownExpandido = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(24.dp))
+
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                    TextButton(onClick = onDismiss) {
+                        Text("Cancelar", color = Color.Gray)
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    TextButton(
+                        onClick = {
+                            if (titulo.isNotBlank()) {
+                                val idAsignadoFinal =
+                                    if (esAdmin) (miembroSeleccionado?.first ?: 0) else 0
+                                onConfirm(titulo, descripcion, fecha, idAsignadoFinal)
+                            }
+                        }
+                    ) {
+                        Text("Crear Tarea", color = azulPrimario, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Composable
 fun DialogoPersonalizadoNuevaLista(
     onDismiss: () -> Unit,
@@ -158,36 +360,36 @@ fun DialogoPersonalizadoNuevaLista(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(15.dp),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
         ) {
             Column(
                 modifier = Modifier
-                    .padding(24.dp)
+                    .padding(25.dp)
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = "Nueva lista",
+                    "Nueva lista",
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 22.sp,
                     color = Color.Black
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(Modifier.height(8.dp))
 
                 Text(
-                    text = "Introduce el nombre para organizar tus tareas.",
+                    "Introduce el nombre para organizar tus tareas.",
                     color = Color.DarkGray,
-                    fontSize = 14.sp
+                    fontSize = 15.sp
                 )
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(Modifier.height(20.dp))
 
                 OutlinedTextField(
-                    value = nombreLista,
-                    onValueChange = { nombreLista = it },
+                    nombreLista,
+                    { nombreLista = it },
                     label = { Text("Nombre de la lista") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
@@ -199,11 +401,10 @@ fun DialogoPersonalizadoNuevaLista(
                     )
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(Modifier.height(24.dp))
 
-                // Controlamos los botones manualmente en una Row alineada al final
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -212,7 +413,7 @@ fun DialogoPersonalizadoNuevaLista(
                     }
 
                     Spacer(
-                        modifier = Modifier.width(8.dp)
+                        Modifier.width(8.dp)
                     )
 
                     TextButton(
