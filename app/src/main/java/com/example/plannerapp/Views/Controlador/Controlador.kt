@@ -3,6 +3,9 @@ package com.example.plannerapp.Views.Controlador
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -21,10 +24,12 @@ fun Controlador() {
     val navBackStackEntry by controller.currentBackStackEntryAsState()
     val rutaActual = navBackStackEntry?.destination?.route
 
+    var abrirDialogo by remember { mutableStateOf(false) }
+
     Scaffold(
         floatingActionButton = {
             if (rutaActual == "Principal") {
-                IconoFlotante({})
+                IconoFlotante({ abrirDialogo = true })
             }
         },
         topBar = {
@@ -53,7 +58,9 @@ fun Controlador() {
             composable("Principal") {
                 PantallaPrincipal(
                     paddingValues = padding,
-                    principalViewModel
+                    principalViewModel,
+                    mostrarDialog = abrirDialogo,
+                    onCambiarMostrarDialog = { abrirDialogo = it }
                 )
             }
         }
