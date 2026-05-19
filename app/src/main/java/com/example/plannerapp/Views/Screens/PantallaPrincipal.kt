@@ -2,8 +2,10 @@ package com.example.plannerapp.Views.Screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,6 +15,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -30,14 +33,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.plannerapp.Domain.ListaConTareas
+import com.example.plannerapp.Domain.Tarea
 import com.example.plannerapp.Views.ViewModels.PrincipalViewModel
 import com.example.plannerapp.ui.theme.Typography
 import com.example.plannerapp.ui.theme.azulPrimario
 
 @Composable
 fun PantallaPrincipal(
-    paddingValues: PaddingValues,
-    myViewModel: PrincipalViewModel
+    paddingValues: PaddingValues, myViewModel: PrincipalViewModel
 ) {
 
     LaunchedEffect(Unit) {
@@ -50,23 +53,8 @@ fun PantallaPrincipal(
             .fillMaxSize()
             .padding(paddingValues),
         contentPadding = PaddingValues(20.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+        verticalArrangement = Arrangement.spacedBy(28.dp)
     ) {
-        item {
-            Text(
-                "Mi WorkSpace",
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 35.sp,
-                color = azulPrimario
-            )
-            Text(
-                "Espacio de trabajo en equipo.",
-                style = Typography.titleMedium,
-                color = Color.DarkGray,
-                modifier = Modifier.padding(top = 2.dp)
-            )
-        }
-
         if (model.listas.isEmpty()) {
             item {
                 Text(
@@ -77,54 +65,65 @@ fun PantallaPrincipal(
             }
         } else {
             items(model.listas) { lista ->
+                EstructuraLista(lista)
+            }
+        }
+    }
+}
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        "${lista.nombreLista} (${lista.listaTareas.size})",
-                        style = Typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
+@Composable
+fun EstructuraLista(lista: ListaConTareas) {
+    Card(
+        Modifier.padding(1.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        shape = RoundedCornerShape(15.dp)
+    ) {
+        Column(Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "${lista.nombreLista} (${lista.listaTareas.size})",
+                    style = Typography.titleMedium,
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 20.sp,
+                    color = Color.Black,
+                    modifier = Modifier.weight(1f)
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     IconButton(onClick = {}) {
-                        Icon(Icons.Rounded.Add, "", tint = azulPrimario)
+                        Icon(Icons.Rounded.Edit, "Editar", tint = Color.Gray)
                     }
-                }
-
-                if (lista.listaTareas.isNotEmpty()) {
-                    LinearProgressIndicator(
-                        progress = { 0.5f },
-                        color = azulPrimario,
-                        trackColor = Color(0xFFE0E0E0),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 4.dp, bottom = 12.dp)
-                            .height(4.dp)
-                    )
-                }
-
-                lista.listaTareas.forEach { tarea ->
-                    Card(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                            .clickable {},
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFFF4F5F7)),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text(
-                            text = tarea.titulo,
-                            modifier = Modifier.padding(16.dp),
-                            style = Typography.bodyLarge,
-                            fontWeight = FontWeight.Medium,
-                            color = Color.Black
-                        )
+                    IconButton(onClick = {}) {
+                        Icon(Icons.Rounded.Add, "Añadir", tint = azulPrimario)
                     }
                 }
             }
+            lista.listaTareas.forEach { tarea ->
+                EstructuraTarea(tarea)
+            }
         }
+    }
+}
+
+@Composable
+fun EstructuraTarea(tarea: Tarea) {
+    Card(
+        Modifier
+            .fillMaxWidth()
+            .padding(5.dp)
+            .clickable {},
+        colors = CardDefaults.cardColors(containerColor = azulPrimario.copy(alpha = 0.15f)),
+        shape = RoundedCornerShape(12.dp),
+    ) {
+        Text(
+            text = tarea.titulo,
+            modifier = Modifier.padding(16.dp),
+            style = Typography.bodyLarge,
+            fontWeight = FontWeight.Medium,
+            color = Color.Black
+        )
     }
 }

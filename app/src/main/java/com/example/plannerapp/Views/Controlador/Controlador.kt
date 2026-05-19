@@ -26,6 +26,20 @@ fun Controlador() {
             if (rutaActual == "Principal") {
                 IconoFlotante({})
             }
+        },
+        topBar = {
+            if (rutaActual != "InicioSesion") {
+                CustomTopBar(
+                    when (rutaActual) {
+                        "Principal" -> "Mi Workspace"
+                        else -> ""
+                    },
+                    when (rutaActual) {
+                        "Principal" -> "Espacio de trabajo y listado de tareas"
+                        else -> ""
+                    }
+                )
+            }
         }
     ) { padding ->
         val inicioViewModel: InicioSesionViewModel = hiltViewModel()
