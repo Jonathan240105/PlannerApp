@@ -1,5 +1,6 @@
 package com.example.plannerapp.Data.Repository
 
+import com.example.plannerapp.Data.LocalData.SeguridadToken.ManejadorDeSesiones
 import com.example.plannerapp.Data.LocalData.Tareas.TareaLocalDao
 import com.example.plannerapp.Data.LocalData.Tareas.toEntity
 import com.example.plannerapp.Data.LocalData.Tareas.toTarea
@@ -15,7 +16,8 @@ import javax.inject.Inject
 
 class RepositoryImp @Inject constructor(
     private val dataInterface: DataInterface,
-    private val tareaLocalDao: TareaLocalDao
+    private val tareaLocalDao: TareaLocalDao,
+    private val manejadorDeSesiones: ManejadorDeSesiones
 ) : Repository {
 
     override suspend fun iniciarSesion(
@@ -25,6 +27,7 @@ class RepositoryImp @Inject constructor(
 
         val respuesta = dataInterface.iniciarSesion(InicioSesionSolicitud(email, contra))
         if (respuesta.isSuccessful) {
+            manejadorDeSesiones.guardarToken(respuesta.body()?.token ?: "")
             emit(EstadoInicioSesion(exito = true, respuesta.body()?.token))
         } else {
             emit(EstadoInicioSesion(exito = false, null))

@@ -13,7 +13,7 @@ import com.example.plannerapp.Domain.Tarea
 import com.example.plannerapp.Views.Screens.PantallaInicioSesion
 import com.example.plannerapp.Views.Screens.PantallaPrincipal
 import com.example.plannerapp.Views.ViewModels.InicioSesionViewModel
-import kotlinx.coroutines.flow.combine
+import com.example.plannerapp.Views.ViewModels.PrincipalViewModel
 
 @Composable
 fun Controlador() {
@@ -29,6 +29,8 @@ fun Controlador() {
         }
     ) { padding ->
         val inicioViewModel: InicioSesionViewModel = hiltViewModel()
+        val principalViewModel: PrincipalViewModel = hiltViewModel()
+
         NavHost(navController = controller, startDestination = "InicioSesion") {
 
             composable("InicioSesion") {
@@ -37,64 +39,7 @@ fun Controlador() {
             composable("Principal") {
                 PantallaPrincipal(
                     paddingValues = padding,
-                    listasConTareas = listOf(
-                        ListaConTareas(
-                            1,
-                            "Lista1",
-                            listOf(
-                                Tarea(
-                                    1,
-                                    "Tarea1"
-                                ),
-                                Tarea(
-                                    1,
-                                    "Tarea1"
-                                ),
-                                Tarea(
-                                    1,
-                                    "Tarea1"
-                                ),
-                                Tarea(
-                                    1,
-                                    "Tarea1"
-                                ),
-                                Tarea(
-                                    1,
-                                    "Tarea1"
-                                ),
-                            ),
-                            1
-                        ),
-                        ListaConTareas(
-                            1,
-                            "Lista1",
-                            listOf(
-                                Tarea(
-                                    1,
-                                    "Tarea1"
-                                ),
-                                Tarea(
-                                    1,
-                                    "Tarea1"
-                                ),
-                                Tarea(
-                                    1,
-                                    "Tarea1"
-                                ),
-                                Tarea(
-                                    1,
-                                    "Tarea1"
-                                ),
-                                Tarea(
-                                    1,
-                                    "Tarea1"
-                                ),
-                            ),
-                            1
-                        ),
-                    ),
-                    onTareaClick = {},
-                    onNuevaTareaClick = {}
+                    principalViewModel
                 )
             }
         }

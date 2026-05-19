@@ -20,6 +20,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,15 +30,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.plannerapp.Domain.ListaConTareas
+import com.example.plannerapp.Views.ViewModels.PrincipalViewModel
 import com.example.plannerapp.ui.theme.Typography
 import com.example.plannerapp.ui.theme.azulPrimario
 
 @Composable
 fun PantallaPrincipal(
     paddingValues: PaddingValues,
-    listasConTareas: List<ListaConTareas>,
-    onTareaClick: (Int) -> Unit,
+    myViewModel: PrincipalViewModel
 ) {
+
+    LaunchedEffect(Unit) {
+        myViewModel.getListasConTareas()
+    }
+    val model by myViewModel.model.collectAsState()
+
     LazyColumn(
         Modifier
             .fillMaxSize()
@@ -58,7 +67,7 @@ fun PantallaPrincipal(
             )
         }
 
-        if (listasConTareas.isEmpty()) {
+        if (model.listas.isEmpty()) {
             item {
                 Text(
                     "No hay listas creadas en este tablero",
@@ -67,7 +76,7 @@ fun PantallaPrincipal(
                 )
             }
         } else {
-            items(listasConTareas) { lista ->
+            items(model.listas) { lista ->
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -102,7 +111,7 @@ fun PantallaPrincipal(
                         Modifier
                             .fillMaxWidth()
                             .padding(vertical = 4.dp)
-                            .clickable { onTareaClick(tarea.idTarea) },
+                            .clickable {},
                         colors = CardDefaults.cardColors(containerColor = Color(0xFFF4F5F7)),
                         shape = RoundedCornerShape(12.dp)
                     ) {
