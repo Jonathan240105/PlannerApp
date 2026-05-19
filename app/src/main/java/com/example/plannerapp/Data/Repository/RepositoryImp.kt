@@ -62,4 +62,16 @@ class RepositoryImp @Inject constructor(
             emptyList()
         }
     }
+
+    override suspend fun crearLista(nombre: String): Boolean {
+        try {
+            val respuesta = dataInterface.crearLista(nombre)
+
+            return respuesta.isSuccessful
+
+        } catch (e: Exception) {
+            println(e.message)
+            return false
+        }
+    }
 }

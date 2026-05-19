@@ -31,4 +31,31 @@ class PrincipalViewModel @Inject constructor(
             }
         }
     }
+
+    fun crearLista(nombre: String) {
+        viewModelScope.launch {
+            _model.update { it.copy(cargandoLista = true) }
+            val respuesta = repository.crearLista(nombre)
+
+            if (respuesta) {
+                _model.update {
+                    it.copy(
+                        listas = repository.obtenerListas(),
+                        cargandoLista = false,
+                        exitoLista = true
+                    )
+                }
+            } else {
+                _model.update {
+                    it.copy(
+                        cargandoLista = false,
+                        exitoLista = false
+                    )
+                }
+            }
+            _model.update {
+                it.copy()
+            }
+        }
+    }
 }

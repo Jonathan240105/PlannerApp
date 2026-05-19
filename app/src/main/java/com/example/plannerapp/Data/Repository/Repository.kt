@@ -9,4 +9,5 @@ import kotlinx.coroutines.flow.Flow
 interface Repository {
     suspend fun iniciarSesion(email: String, contra: String): Flow<EstadoInicioSesion>
     suspend fun obtenerListas(): List<ListaConTareas>
+    suspend fun crearLista(nombre : String) : Boolean
 }
