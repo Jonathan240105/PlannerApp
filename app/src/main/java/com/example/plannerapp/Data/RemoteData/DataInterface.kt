@@ -5,12 +5,15 @@ import com.example.plannerapp.Data.RemoteData.Responses.InicioSesionRespuesta
 import com.example.plannerapp.Data.RemoteData.Responses.InicioSesionSolicitud
 import com.example.plannerapp.Data.RemoteData.Responses.ListaConTareasRespuesta
 import com.example.plannerapp.Data.RemoteData.Responses.ListaMiembrosRespuesta
+import com.example.plannerapp.Data.RemoteData.Responses.SubtareaRespuesta
+import com.example.plannerapp.Data.RemoteData.Responses.TareaRespuesta
 import com.example.plannerapp.Data.RemoteData.Responses.UsuarioPerfilRespuesta
 import com.example.plannerapp.Data.RemoteData.Variables.Endpoints
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 
@@ -43,4 +46,15 @@ interface DataInterface {
 
     @GET(Endpoints.obtenerPerfil)
     suspend fun obtenerPerfil(): Response<UsuarioPerfilRespuesta?>
+
+    @GET(Endpoints.obtenerSubtareas)
+    suspend fun obtenerSubtareas(
+        @Path("idSubtarea") idTarea: Int
+    ): Response<List<SubtareaRespuesta>>
+
+    @GET(Endpoints.getTarea)
+    suspend fun getTareaPorId(
+        @Path("id") idTarea: Int
+    ): Response<TareaRespuesta>
+
 }

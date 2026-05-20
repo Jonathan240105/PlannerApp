@@ -9,4 +9,6 @@ object Endpoints {
     const val listarMiembros = "tareas/equipo/miembros"
 
     const val obtenerPerfil = "usuarios/perfil"
+    const val obtenerSubtareas = "/subtareas/{idSubtarea}"
+    const val getTarea = "/tareas/get/{id}"
 }
