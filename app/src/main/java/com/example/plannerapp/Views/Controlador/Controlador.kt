@@ -13,9 +13,11 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.plannerapp.Domain.ListaConTareas
 import com.example.plannerapp.Domain.Tarea
+import com.example.plannerapp.Views.Screens.PantallaDetalleTarea
 import com.example.plannerapp.Views.Screens.PantallaInicioSesion
 import com.example.plannerapp.Views.Screens.PantallaPerfil
 import com.example.plannerapp.Views.Screens.PantallaPrincipal
+import com.example.plannerapp.Views.ViewModels.DetalleTareaViewModel
 import com.example.plannerapp.Views.ViewModels.InicioSesionViewModel
 import com.example.plannerapp.Views.ViewModels.PerfilViewModel
 import com.example.plannerapp.Views.ViewModels.PrincipalViewModel
@@ -40,11 +42,13 @@ fun Controlador() {
                     when (rutaActual) {
                         "Principal" -> "Mi Workspace"
                         "Perfil" -> "Mi Perfil"
+                        "DetallePerfil/{id}" -> "Detalle de Tarea"
                         else -> ""
                     },
                     when (rutaActual) {
                         "Principal" -> "Espacio de trabajo y listado de tareas"
                         "Perfil" -> "Perfil de usuario"
+                        "DetallePerfil/{id}" -> "Tarea y subtareas"
                         else -> ""
                     }
                 )
@@ -59,6 +63,7 @@ fun Controlador() {
         val inicioViewModel: InicioSesionViewModel = hiltViewModel()
         val principalViewModel: PrincipalViewModel = hiltViewModel()
         val perfilViewModel: PerfilViewModel = hiltViewModel()
+        val detalleViewModel: DetalleTareaViewModel = hiltViewModel()
 
         NavHost(navController = controller, startDestination = "InicioSesion") {
 
@@ -70,11 +75,16 @@ fun Controlador() {
                     paddingValues = padding,
                     principalViewModel,
                     mostrarDialog = abrirDialogo,
-                    onCambiarMostrarDialog = { abrirDialogo = it }
+                    onCambiarMostrarDialog = { abrirDialogo = it },
+                    { controller.navigate("DetallePerfil/$it") }
                 )
             }
             composable("Perfil") {
-                PantallaPerfil(padding,perfilViewModel,{controller.navigate("InicioSesion")})
+                PantallaPerfil(padding, perfilViewModel, { controller.navigate("InicioSesion") })
+            }
+            composable("DetallePerfil/{id}") {
+                val id = it.arguments?.getString("id")?.toInt() ?: 0
+                PantallaDetalleTarea(padding, detalleViewModel, id)
             }
         }
     }

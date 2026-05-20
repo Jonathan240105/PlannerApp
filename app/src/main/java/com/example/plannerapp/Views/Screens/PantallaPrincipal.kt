@@ -2,6 +2,7 @@ package com.example.plannerapp.Views.Screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -58,7 +59,8 @@ fun PantallaPrincipal(
     paddingValues: PaddingValues,
     myViewModel: PrincipalViewModel,
     mostrarDialog: Boolean,
-    onCambiarMostrarDialog: (Boolean) -> Unit
+    onCambiarMostrarDialog: (Boolean) -> Unit,
+    irADetalle: (Int) -> Unit
 ) {
     val model by myViewModel.model.collectAsState()
 
@@ -110,7 +112,8 @@ fun PantallaPrincipal(
                 items(listasAMostrar) { lista ->
                     EstructuraLista(
                         lista = lista,
-                        onAñadirTarea = { idListaSeleccionada = lista.idLista }
+                        onAñadirTarea = { idListaSeleccionada = lista.idLista },
+                        irADetalle
                     )
                 }
             }
@@ -150,7 +153,7 @@ fun PantallaPrincipal(
 }
 
 @Composable
-fun EstructuraLista(lista: ListaConTareas, onAñadirTarea: () -> Unit) {
+fun EstructuraLista(lista: ListaConTareas, onAñadirTarea: () -> Unit,irADetalle: (Int) -> Unit) {
     Card(
         Modifier.padding(1.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -180,32 +183,37 @@ fun EstructuraLista(lista: ListaConTareas, onAñadirTarea: () -> Unit) {
                 }
             }
             lista.listaTareas.forEach { tarea ->
-                EstructuraTarea(tarea)
+                EstructuraTarea(tarea, irADetalle)
             }
         }
     }
 }
 
 @Composable
-fun EstructuraTarea(tarea: Tarea) {
+fun EstructuraTarea(tarea: Tarea, irADetalle: (Int) -> Unit) {
     Card(
-        Modifier
+        modifier = Modifier
             .fillMaxWidth()
-            .padding(5.dp)
-            .clickable {},
-        colors = CardDefaults.cardColors(containerColor = azulPrimario.copy(alpha = 0.15f)),
+            .padding(vertical = 4.dp, horizontal = 5.dp)
+            .clickable { irADetalle(tarea.idTarea) },
+        colors = CardDefaults.cardColors(
+            containerColor = azulPrimario.copy(alpha = 0.15f)
+        ),
         shape = RoundedCornerShape(12.dp),
     ) {
-        Text(
-            text = tarea.titulo,
-            modifier = Modifier.padding(16.dp),
-            style = Typography.bodyLarge,
-            fontWeight = FontWeight.Medium,
-            color = Color.Black
-        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = tarea.titulo.ifBlank { "Tarea sin título" },
+                fontWeight = FontWeight.Medium,
+                color = Color.Black
+            )
+        }
     }
 }
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DialogoNuevaTarea(
