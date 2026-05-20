@@ -14,8 +14,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.plannerapp.Domain.ListaConTareas
 import com.example.plannerapp.Domain.Tarea
 import com.example.plannerapp.Views.Screens.PantallaInicioSesion
+import com.example.plannerapp.Views.Screens.PantallaPerfil
 import com.example.plannerapp.Views.Screens.PantallaPrincipal
 import com.example.plannerapp.Views.ViewModels.InicioSesionViewModel
+import com.example.plannerapp.Views.ViewModels.PerfilViewModel
 import com.example.plannerapp.Views.ViewModels.PrincipalViewModel
 
 @Composable
@@ -37,18 +39,26 @@ fun Controlador() {
                 CustomTopBar(
                     when (rutaActual) {
                         "Principal" -> "Mi Workspace"
+                        "Perfil" -> "Mi Perfil"
                         else -> ""
                     },
                     when (rutaActual) {
                         "Principal" -> "Espacio de trabajo y listado de tareas"
+                        "Perfil" -> "Perfil de usuario"
                         else -> ""
                     }
                 )
+            }
+        },
+        bottomBar = {
+            if (rutaActual != "InicioSesion") {
+                CustomBottomBar(controller)
             }
         }
     ) { padding ->
         val inicioViewModel: InicioSesionViewModel = hiltViewModel()
         val principalViewModel: PrincipalViewModel = hiltViewModel()
+        val perfilViewModel: PerfilViewModel = hiltViewModel()
 
         NavHost(navController = controller, startDestination = "InicioSesion") {
 
@@ -62,6 +72,9 @@ fun Controlador() {
                     mostrarDialog = abrirDialogo,
                     onCambiarMostrarDialog = { abrirDialogo = it }
                 )
+            }
+            composable("Perfil") {
+                PantallaPerfil(padding,perfilViewModel,{controller.navigate("InicioSesion")})
             }
         }
     }

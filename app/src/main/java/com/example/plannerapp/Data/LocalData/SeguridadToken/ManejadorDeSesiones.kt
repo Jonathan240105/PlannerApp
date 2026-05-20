@@ -28,15 +28,21 @@ class ManejadorDeSesiones @Inject constructor(
 
             try {
                 val jwt = JWT(token)
-                val rol = jwt.getClaim("rol").asString()
+                val rolClaim = jwt.getClaim("rol")
+                val rol = rolClaim.asString() ?: ""
 
-                preferences[rolAdmin] = (rol == "admin")
+                preferences[rolAdmin] = rol.equals("admin", ignoreCase = true)
             } catch (e: Exception) {
                 preferences[rolAdmin] = false
             }
         }
     }
 
+    suspend fun cerrarSesion() {
+        context.dataStore.edit { preferences ->
+            preferences.clear()
+        }
+    }
     val tokenFlow: Flow<String?> = context.dataStore.data.map { preferences ->
         preferences[tokenJWT]
     }

@@ -2,6 +2,7 @@ package com.example.plannerapp.Views.ViewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.plannerapp.Data.LocalData.SeguridadToken.ManejadorDeSesiones
 import com.example.plannerapp.Data.RemoteData.Responses.CrearTareaSolicitud
 import com.example.plannerapp.Data.Repository.Repository
 import com.example.plannerapp.Domain.ModelPrincipal
@@ -14,12 +15,20 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PrincipalViewModel @Inject constructor(
-    private val repository: Repository
+    private val repository: Repository,
+    manejadorDeSesiones: ManejadorDeSesiones
 ) : ViewModel() {
 
     private val _model = MutableStateFlow(ModelPrincipal())
     val model = _model.asStateFlow()
 
+    init {
+        viewModelScope.launch {
+            manejadorDeSesiones.esAdminFlow.collect { admin ->
+                _model.update { it.copy(esAdmin = admin) }
+            }
+        }
+    }
     fun getListasConTareas() {
         viewModelScope.launch {
             _model.update { it.copy(cargandoLista = true) }
