@@ -2,17 +2,17 @@ package com.example.plannerapp.Data.Repository
 
 import com.example.plannerapp.Data.LocalData.SeguridadToken.ManejadorDeSesiones
 import com.example.plannerapp.Data.LocalData.Tareas.TareaLocalDao
-import com.example.plannerapp.Data.LocalData.Tareas.toEntity
-import com.example.plannerapp.Data.LocalData.Tareas.toTarea
 import com.example.plannerapp.Data.RemoteData.DataInterface
 import com.example.plannerapp.Data.RemoteData.Responses.CrearTareaSolicitud
 import com.example.plannerapp.Data.RemoteData.Responses.InicioSesionSolicitud
-import com.example.plannerapp.Data.RemoteData.Responses.ListaConTareasRespuesta
 import com.example.plannerapp.Data.RemoteData.Responses.ListaMiembrosRespuesta
+import com.example.plannerapp.Data.RemoteData.Responses.SubtareaRespuesta
 import com.example.plannerapp.Data.RemoteData.Responses.UsuarioPerfilRespuesta
+import com.example.plannerapp.Data.RemoteData.Responses.toTareaDomain
 import com.example.plannerapp.Domain.EstadoInicioSesion
 import com.example.plannerapp.Domain.ListaConTareas
 import com.example.plannerapp.Domain.Tarea
+import com.example.plannerapp.Domain.TareaDomain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
@@ -103,7 +103,7 @@ class RepositoryImp @Inject constructor(
                         idLista = lista.idLista,
                         nombreLista = lista.nombreLista,
                         posicion = lista.posicion,
-                        listaTareas = lista.tareas.map { Tarea(it.idTarea, it.titulo) }
+                        listaTareas = lista.tareas.map { Tarea(it.idTarea, titulo = it.titulo) }
                     )
                 }
             } else {
@@ -143,5 +143,31 @@ class RepositoryImp @Inject constructor(
         manejadorDeSesiones.cerrarSesion()
     }
 
+    override suspend fun obtenerSubtareas(idTarea: Int): List<SubtareaRespuesta> {
+        try {
+            val respuesta = dataInterface.obtenerSubtareas(idTarea)
 
+            if (respuesta.isSuccessful) {
+                return respuesta.body() ?: emptyList()
+            } else {
+                return emptyList()
+            }
+        } catch (e: Exception) {
+            return emptyList()
+        }
+    }
+
+    override suspend fun getTarea(idTarea: Int): TareaDomain {
+        try {
+            val respuesta = dataInterface.getTareaPorId(idTarea)
+            if (respuesta.isSuccessful) {
+                return respuesta.body()?.toTareaDomain() ?: TareaDomain()
+            } else {
+                return TareaDomain()
+            }
+        } catch (e: Exception) {
+            println(e.message)
+            return TareaDomain()
+        }
+    }
 }

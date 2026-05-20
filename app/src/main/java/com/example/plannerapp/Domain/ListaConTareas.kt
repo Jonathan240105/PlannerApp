@@ -1,8 +1,9 @@
 package com.example.plannerapp.Domain
 
 data class Tarea(
-    val idTarea: Int,
-    val titulo: String,
+    val idTarea: Int = 0,
+    val descripcion: String = "",
+    val titulo: String = "",
     val fecha_limite: String = "",
     val idListaAsignada: Int = 0,
     val fecha_creacion: String = "",

@@ -2,10 +2,11 @@ package com.example.plannerapp.Data.Repository
 
 import com.example.plannerapp.Data.RemoteData.Responses.CrearTareaSolicitud
 import com.example.plannerapp.Data.RemoteData.Responses.ListaMiembrosRespuesta
+import com.example.plannerapp.Data.RemoteData.Responses.SubtareaRespuesta
 import com.example.plannerapp.Data.RemoteData.Responses.UsuarioPerfilRespuesta
 import com.example.plannerapp.Domain.EstadoInicioSesion
 import com.example.plannerapp.Domain.ListaConTareas
-import com.example.plannerapp.Domain.Tarea
+import com.example.plannerapp.Domain.TareaDomain
 import kotlinx.coroutines.flow.Flow
 
 
@@ -18,4 +19,6 @@ interface Repository {
     suspend fun obtenerMiembrosEquipo(): List<ListaMiembrosRespuesta>
     suspend fun obtenerPerfilUsuario(): UsuarioPerfilRespuesta?
     suspend fun cerrarSesion()
+    suspend fun obtenerSubtareas(idTarea: Int): List<SubtareaRespuesta>
+    suspend fun getTarea(idTarea: Int): TareaDomain
 }
