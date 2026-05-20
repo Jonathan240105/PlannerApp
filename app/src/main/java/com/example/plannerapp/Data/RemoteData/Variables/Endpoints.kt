@@ -6,5 +6,7 @@ object Endpoints {
     const val crearLista = "/lista/nuevo"
     const val crearTarea = "/tareas/nuevo"
     const val listarListasEquipo = "lista/equipo"
-    const val listarMiembros = "tarea/equipo/miembros"
+    const val listarMiembros = "tareas/equipo/miembros"
+
+    const val obtenerPerfil = "usuarios/perfil"
 }

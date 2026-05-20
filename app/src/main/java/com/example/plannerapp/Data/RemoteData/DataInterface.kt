@@ -5,6 +5,7 @@ import com.example.plannerapp.Data.RemoteData.Responses.InicioSesionRespuesta
 import com.example.plannerapp.Data.RemoteData.Responses.InicioSesionSolicitud
 import com.example.plannerapp.Data.RemoteData.Responses.ListaConTareasRespuesta
 import com.example.plannerapp.Data.RemoteData.Responses.ListaMiembrosRespuesta
+import com.example.plannerapp.Data.RemoteData.Responses.UsuarioPerfilRespuesta
 import com.example.plannerapp.Data.RemoteData.Variables.Endpoints
 import retrofit2.Response
 import retrofit2.http.Body
@@ -39,4 +40,7 @@ interface DataInterface {
 
     @GET(Endpoints.listarMiembros)
     suspend fun obtenerMiembrosDropdown(): Response<List<ListaMiembrosRespuesta>>
+
+    @GET(Endpoints.obtenerPerfil)
+    suspend fun obtenerPerfil(): Response<UsuarioPerfilRespuesta?>
 }

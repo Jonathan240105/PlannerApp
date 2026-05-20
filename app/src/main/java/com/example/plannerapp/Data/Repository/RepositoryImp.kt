@@ -9,6 +9,7 @@ import com.example.plannerapp.Data.RemoteData.Responses.CrearTareaSolicitud
 import com.example.plannerapp.Data.RemoteData.Responses.InicioSesionSolicitud
 import com.example.plannerapp.Data.RemoteData.Responses.ListaConTareasRespuesta
 import com.example.plannerapp.Data.RemoteData.Responses.ListaMiembrosRespuesta
+import com.example.plannerapp.Data.RemoteData.Responses.UsuarioPerfilRespuesta
 import com.example.plannerapp.Domain.EstadoInicioSesion
 import com.example.plannerapp.Domain.ListaConTareas
 import com.example.plannerapp.Domain.Tarea
@@ -124,4 +125,23 @@ class RepositoryImp @Inject constructor(
             return emptyList()
         }
     }
+
+    override suspend fun obtenerPerfilUsuario(): UsuarioPerfilRespuesta? {
+        return try {
+            val respuesta = dataInterface.obtenerPerfil()
+            if (respuesta.isSuccessful) {
+                return respuesta.body()
+            } else {
+                return null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    override suspend fun cerrarSesion() {
+        manejadorDeSesiones.cerrarSesion()
+    }
+
+
 }
