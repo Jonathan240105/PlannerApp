@@ -13,6 +13,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -56,5 +57,10 @@ interface DataInterface {
     suspend fun getTareaPorId(
         @Path("id") idTarea: Int
     ): Response<TareaRespuesta>
+
+    @PUT(Endpoints.cambiarEstadoSubtarea)
+    suspend fun cambiarEstadoSubtarea(
+        @Path("idSubtarea") idSubtarea: Int
+    ): Response<SubtareaRespuesta>
 
 }

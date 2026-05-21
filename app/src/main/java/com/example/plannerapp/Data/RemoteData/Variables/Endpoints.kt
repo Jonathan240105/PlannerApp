@@ -11,4 +11,5 @@ object Endpoints {
     const val obtenerPerfil = "usuarios/perfil"
     const val obtenerSubtareas = "/subtareas/{idSubtarea}"
     const val getTarea = "/tareas/get/{id}"
+    const val cambiarEstadoSubtarea = "subtareas/{idSubtarea}/estado"
 }
