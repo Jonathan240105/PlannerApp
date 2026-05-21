@@ -8,9 +8,11 @@ import com.example.plannerapp.Data.RemoteData.Responses.InicioSesionSolicitud
 import com.example.plannerapp.Data.RemoteData.Responses.ListaMiembrosRespuesta
 import com.example.plannerapp.Data.RemoteData.Responses.SubtareaRespuesta
 import com.example.plannerapp.Data.RemoteData.Responses.UsuarioPerfilRespuesta
+import com.example.plannerapp.Data.RemoteData.Responses.toSubtarea
 import com.example.plannerapp.Data.RemoteData.Responses.toTareaDomain
 import com.example.plannerapp.Domain.EstadoInicioSesion
 import com.example.plannerapp.Domain.ListaConTareas
+import com.example.plannerapp.Domain.Subtarea
 import com.example.plannerapp.Domain.Tarea
 import com.example.plannerapp.Domain.TareaDomain
 import kotlinx.coroutines.flow.Flow
@@ -168,6 +170,20 @@ class RepositoryImp @Inject constructor(
         } catch (e: Exception) {
             println(e.message)
             return TareaDomain()
+        }
+    }
+
+    override suspend fun cambiarEstadoSubtarea(idSubtarea: Int): Subtarea {
+        try {
+            val response = dataInterface.cambiarEstadoSubtarea(idSubtarea)
+            if (response.isSuccessful && response.body() != null) {
+                return response.body()?.toSubtarea() ?: SubtareaRespuesta().toSubtarea()
+            } else {
+                return Subtarea()
+            }
+        } catch (e: Exception) {
+            println(e.message)
+            return Subtarea()
         }
     }
 }
