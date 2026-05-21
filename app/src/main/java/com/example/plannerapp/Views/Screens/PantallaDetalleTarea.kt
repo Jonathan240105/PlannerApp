@@ -175,7 +175,10 @@ fun PantallaDetalleTarea(
                                 model.listaSubtareas.forEach { subtarea ->
                                     EstructuraSubtarea(
                                         subtarea = subtarea,
-                                        onCambioEstado = { idSubtarea, nuevoEstado ->
+                                        onCambioEstado = {
+                                            subtarea.id?.let { id ->
+                                                myViewModel.marcarSubtarea(id, idTarea)
+                                            }
                                         }
                                     )
                                 }
@@ -199,7 +202,7 @@ fun PantallaDetalleTarea(
 @Composable
 fun EstructuraSubtarea(
     subtarea: Subtarea,
-    onCambioEstado: (Int, Boolean) -> Unit
+    onCambioEstado: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -225,7 +228,8 @@ fun EstructuraSubtarea(
 
             Checkbox(
                 checked = subtarea.estado ?: false,
-                onCheckedChange = { checkeado ->
+                onCheckedChange = {
+                    onCambioEstado()
                 },
                 colors = CheckboxDefaults.colors(
                     checkedColor = azulPrimario,

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.plannerapp.Data.RemoteData.Responses.toSubtarea
 import com.example.plannerapp.Data.Repository.Repository
 import com.example.plannerapp.Domain.ModelDetalleTarea
+import com.example.plannerapp.Domain.Subtarea
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -51,6 +52,32 @@ class DetalleTareaViewModel @Inject constructor(
             } catch (e: Exception) {
                 println("Algo fue mal ${e.message}")
                 _model.update { it.copy(exitoTarea = false, cargandoTarea = false) }
+            }
+        }
+    }
+
+    fun marcarSubtarea(idSubtarea: Int, idTarea: Int) {
+        viewModelScope.launch {
+            try {
+                val subtareaActualizada = repository.cambiarEstadoSubtarea(idSubtarea)
+
+                if (subtareaActualizada != null) {
+                    _model.update { estadoActual ->
+                        estadoActual.copy(
+                            listaSubtareas = estadoActual.listaSubtareas.map { subtareaDeLaLista ->
+                                if (subtareaDeLaLista.id == idSubtarea) {
+                                    subtareaActualizada
+
+                                } else {
+                                    subtareaDeLaLista
+                                }
+                            }
+                        )
+                    }
+                    cargarTarea(idTarea)
+                }
+            } catch (e: Exception) {
+                println("Algo fue mal al cambiar el estado de la subtarea: ${e.message}")
             }
         }
     }
