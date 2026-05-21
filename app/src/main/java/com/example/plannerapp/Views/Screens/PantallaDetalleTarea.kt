@@ -1,5 +1,7 @@
 package com.example.plannerapp.Views.Screens
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,6 +48,7 @@ import com.example.plannerapp.Views.ViewModels.DetalleTareaViewModel
 import com.example.plannerapp.ui.theme.Typography
 import com.example.plannerapp.ui.theme.azulPrimario
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PantallaDetalleTarea(
     paddingValues: PaddingValues,
@@ -119,7 +122,7 @@ fun PantallaDetalleTarea(
                                     color = Color.Gray
                                 )
                                 Text(
-                                    text = model.tarea.fechaLimite ?: "No establecida",
+                                    text = FechaUtils.deApiALegible(model.tarea.fechaLimite)  ?: "No establecida",
                                     fontSize = 14.sp,
                                     color = Color.Black
                                 )
