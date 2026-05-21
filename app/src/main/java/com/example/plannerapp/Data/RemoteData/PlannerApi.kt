@@ -1,10 +1,12 @@
 package com.example.plannerapp.Data.RemoteData
 
+import com.example.plannerapp.Data.LocalData.SeguridadToken.InterceptorAutenticacion
 import com.example.plannerapp.Data.RemoteData.Variables.APIUrls.urlPlanner
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
@@ -15,9 +17,17 @@ object PlannerApi {
 
     @Provides
     @Singleton
-    fun provideRetrofit(): Retrofit =
+    fun provideOkHttpClient(InterceptorAutenticacion: InterceptorAutenticacion): OkHttpClient =
+        OkHttpClient.Builder().addInterceptor(
+            InterceptorAutenticacion
+        ).build()
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(cliente: OkHttpClient): Retrofit =
         Retrofit.Builder()
             .baseUrl(urlPlanner)
+            .client(cliente)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 

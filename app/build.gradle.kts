@@ -81,4 +81,10 @@ dependencies {
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.junit)
+
+    //Datastore
+    implementation(libs.androidx.datastore.preferences)
+
+    //JWT
+    implementation("com.auth0.android:jwtdecode:2.0.2")
 }
